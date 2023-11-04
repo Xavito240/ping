@@ -1,0 +1,22 @@
+$IPFile = "C:\Chemin\vers\le\fichier\ip-list.txt"
+$LogFile = "C:\Chemin\vers\le\fichier\resultat.txt"
+
+# Vérification et suppression du fichier journal s'il existe
+if (Test-Path $LogFile) {
+    Remove-Item $LogFile
+}
+
+Write-Host "Pinging IP addresses..."
+
+Get-Content -Path $IPFile | ForEach-Object {
+    $IP = $_
+    $pingResult = Test-Connection -ComputerName $IP -Count 1 -Quiet
+
+    if ($pingResult) {
+        Write-Output "$IP en ligne." | Out-File -FilePath $LogFile -Append
+    } else {
+        Write-Output "$IP hors ligne." | Out-File -FilePath $LogFile -Append
+    }
+}
+
+Write-Host "Pinging complete. Check $LogFile for results."
